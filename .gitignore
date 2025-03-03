@@ -1,0 +1,51 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+VENV/
+*.egg-info/
+dist/
+build/
+
+# IDEs and Editors
+.idea/
+.vscode/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Python virtual environments
+.venv/
+env/
+venv/
+
+# Test and coverage reports
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pdb
+.coverage
+nosetests.xml
+test_*.xml
+coverage.xml
+*.cover
+
+# Database files
+*.sqlite3
+
+# VS Code settings
+.vscode/
+
+# MySQL, PostgreSQL, and other database configuration files
+*.sql
+*.db
+
+# Other temporary files
+*.swp
+*.swo
