@@ -2,6 +2,8 @@ import importlib
 import os 
 from sessions import get_session_for_app
 from models.app import Module
+import logging
+from flask_admin import BaseView
 
 def import_base(module_name):
     """
@@ -22,6 +24,35 @@ def import_base(module_name):
     
     except ImportError as e:
         print(f"Error importing module {module_name}: {e}")
+        raise
+    
+    
+def import_view_module(module_name):
+    try:
+        # Dynamically import the module from the 'views' folder
+        full_module_name = f"views.{module_name}"
+        module = importlib.import_module(full_module_name)
+
+        # List to store instances of BaseView
+        baseview_instances = []
+
+        # Iterate through all classes in the module
+        for attribute_name in dir(module):
+            attribute = getattr(module, attribute_name)
+
+            # Check if the attribute is a subclass of BaseView
+            if isinstance(attribute, type) and issubclass(attribute, BaseView):
+                # Instantiate and add to the list of BaseView instances
+                baseview_instances.append(attribute())  # Creating an instance of the BaseView subclass
+
+        # Log if no views were found in the module
+        if not baseview_instances:
+            logging.info(f"{full_module_name} does not contain any Flask Admin views (subclasses of BaseView).")
+
+        return baseview_instances
+
+    except ImportError as e:
+        logging.error(f"Error importing module {full_module_name}: {e}")
         raise
 
 def get_all_modules(models_path="models"):

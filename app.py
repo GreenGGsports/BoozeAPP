@@ -1,7 +1,8 @@
 from flask import Flask, g, request 
 from flask_sqlalchemy import SQLAlchemy
-from views.admin import admin_blueprint, create_admin
-
+from flask_admin import Admin
+from views.admin import  create_admin
+from views.base import BaseAdminView
 from modules import import_base 
 from sessions import get_current_customer_id, get_session_for_customer, get_session_for_app
 from database import create_db
@@ -10,6 +11,7 @@ from database import create_db
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'  # Update your DB URI if necessary
 app.config['SECRET_KEY'] = 'mysecret'
+admin = Admin(app, name="Dynamic Admin", template_mode="bootstrap4", url="/Admin", endpoint="admin_main")
 
 def create_app():
     create_db("app_db", "models.app")
@@ -17,10 +19,8 @@ def create_app():
     # Initialize the database
 
     # Register the admin Blueprint
-    app.register_blueprint(admin_blueprint, url_prefix='/app_admin')
-
-    # Create the Flask-Admin interface
-    create_admin().init_app(app)
+    app_admin = create_admin()
+    app_admin.init_app(app)  # Ensure this is called **only once**
 
     return app
 
@@ -40,6 +40,7 @@ def before_request():
         if customer_id:
             # Get the session for the specific customer
             g.session = get_session_for_customer(customer_id)
+            BaseAdminView.register_views(admin, customer_id)
         else:
             # Raise an exception only for routes that require a customer ID (non-admin)
             raise ValueError("Customer ID is required")
